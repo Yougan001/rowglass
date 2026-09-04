@@ -1,0 +1,9 @@
+sku,product,price,stock,status
+RG-101,Studio Headphones,89.00,24,active
+RG-102,Desk Light,45.00,62,active
+RG-103,Travel Adapter,24.00,0,retired
+RG-104,Mechanical Keyboard,129.00,18,draft
+RG-105,USB-C Cable,12.00,140,active
+RG-106,Laptop Stand,59.00,35,active
+RG-107,Wireless Mouse,39.00,47,active
+RG-108,Desk Mat,29.00,83,active

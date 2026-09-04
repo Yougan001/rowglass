@@ -1,0 +1,11 @@
+[
+  {"sku":"RG-105","product":"USB-C Cable","price":"12.00","stock":128,"status":"active"},
+  {"sku":"RG-101","product":"Studio Headphones","price":"99.00","stock":20,"status":"active"},
+  {"sku":"RG-102","product":"Desk Light","price":"45.00","stock":62,"status":"active"},
+  {"sku":"RG-104","product":"Mechanical Keyboard","price":"129.00","stock":18,"status":"active"},
+  {"sku":"RG-106","product":"Laptop Stand","price":"59.00","stock":35,"status":"active"},
+  {"sku":"RG-107","product":"Wireless Mouse","price":"39.00","stock":47,"status":"active"},
+  {"sku":"RG-108","product":"Desk Mat","price":"29.00","stock":83,"status":"active"},
+  {"sku":"RG-109","product":"Webcam Pro","price":"79.00","stock":40,"status":"active"},
+  {"sku":"RG-110","product":"Monitor Arm","price":"69.00","stock":22,"status":"active"}
+]

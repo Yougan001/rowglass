@@ -2,7 +2,7 @@
 
 Local-first CSV and JSON diff viewer. Match records by ID, find changed cells, and export a reviewable report without uploading your data.
 
-**Development milestone 2:** a working visual comparison workspace, sample data, cell-level highlights and CSV report export. File import, comparison controls and the final documentation follow in the next milestones.
+**Development milestone 3:** local file import, composite keys, comparison options, filtered and paginated results, CSV/JSON exports, dark mode and mobile layout. The release documentation and screenshots follow in the next milestone.
 
 ## Run the comparison engine
 
@@ -22,7 +22,7 @@ Limits: 5 million characters, 50,000 records, 200 columns per file. JSON objects
 
 ## Development
 
-The web workspace uses React, TypeScript, Vinext and Shadcn components. It calls the same pure engine in `core/compare.mjs`. No data API, analytics or account is required to compare files locally.
+The web workspace uses React, TypeScript, Vite and accessible UI components. It calls the same pure engine in `core/compare.mjs`. No data API, analytics or account is required to compare files locally.
 
 ```sh
 npm ci
