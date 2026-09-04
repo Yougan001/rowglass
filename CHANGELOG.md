@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Update the development server and React patch versions after dependency review.
 - Run parsing, key suggestions and comparisons in a worker with cancellation and stale-result protection.
 - Add four session tests covering failed imports, replacement inputs and isolated datasets.
 - Compare numeric tolerances with exact decimal arithmetic, including large CSV integers and long fractional strings.
