@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ArrowRight,
   ArrowRightLeft,
@@ -21,7 +21,8 @@ import {
 } from '@/components/ui/collapsible';
 import { SourceInput } from '@/components/source-input';
 import { Results } from '@/components/results';
-import { parseDataset, compareDatasets, suggestKey } from '@/core/compare.mjs';
+import { parseDataset, compareDatasets } from '@/core/compare.mjs';
+import { useComparison } from '@/hooks/use-comparison';
 import { DEMO_BEFORE, DEMO_AFTER } from '@/lib/demo';
 
 type Report = ReturnType<typeof compareDatasets>;
@@ -52,17 +53,18 @@ export default function App() {
   const [revision, setRevision] = useState(0),
     [sourceRevision, setSourceRevision] = useState(0),
     [dark, setDark] = useState(false);
-  const inputs = useMemo(() => {
-    try {
-      return {
-        a: parseDataset(left, leftFormat),
-        b: parseDataset(right, rightFormat),
-        error: '',
-      };
-    } catch (e) {
-      return { a: null, b: null, error: (e as Error).message };
-    }
-  }, [left, right, leftFormat, rightFormat]);
+  const job = useRef(0);
+  const [busy, setBusy] = useState(false);
+  const [notice, setNotice] = useState('');
+  const {
+    inputs,
+    loading,
+    compare: compareInWorker,
+    suggest: suggestInWorker,
+    cancel,
+  } = useComparison(left, right, leftFormat, rightFormat);
+  const visibleError =
+    error || (!loading && (left || right) ? inputs.error : '');
   const common =
     inputs.a && inputs.b
       ? inputs.a.columns.filter((c) => inputs.b!.columns.includes(c))
@@ -73,33 +75,44 @@ export default function App() {
   ];
 
   function invalidate() {
+    job.current++;
+    setBusy(false);
     setReport(null);
     setError('');
+    setNotice('');
   }
-  const compare = useCallback(() => {
+  const compare = useCallback(async () => {
+    if (loading || busy) return;
+    const id = ++job.current;
+    setBusy(true);
+    setNotice('');
     try {
       if (!inputs.a || !inputs.b) throw new Error(inputs.error);
       const selected = keys.filter(
         (k) => inputs.a!.columns.includes(k) && inputs.b!.columns.includes(k),
       );
-      const result = compareDatasets(inputs.a, inputs.b, {
+      const result = await compareInWorker({
         ...options,
         keys: selected,
         tolerance: Number(options.tolerance),
       });
+      if (id !== job.current) return;
       setReport(result);
       setRevision((v) => v + 1);
       setError('');
     } catch (e) {
+      if (id !== job.current || (e as Error).name === 'AbortError') return;
       setError((e as Error).message);
       setReport(null);
+    } finally {
+      if (id === job.current) setBusy(false);
     }
-  }, [inputs, keys, options]);
+  }, [inputs, keys, options, loading, busy, compareInWorker]);
   useEffect(() => {
     const listener = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         e.preventDefault();
-        compare();
+        void compare();
       }
     };
     window.addEventListener('keydown', listener);
@@ -109,6 +122,7 @@ export default function App() {
     document.documentElement.classList.toggle('dark', dark);
   }, [dark]);
   function demo() {
+    invalidate();
     setSourceRevision((v) => v + 1);
     setLeft(DEMO_BEFORE);
     setRight(DEMO_AFTER);
@@ -134,23 +148,30 @@ export default function App() {
     setOptions(defaultOptions);
     invalidate();
   }
-  function suggest() {
-    if (!inputs.a || !inputs.b) {
-      setError(inputs.error);
-      return;
-    }
-    const found = suggestKey(inputs.a, inputs.b);
-    if (found) {
+  async function suggest() {
+    if (loading || busy) return;
+    const id = ++job.current;
+    setBusy(true);
+    try {
+      if (!inputs.a || !inputs.b) throw new Error(inputs.error);
+      const found = await suggestInWorker();
+      if (id !== job.current) return;
+      if (!found)
+        throw new Error(
+          'No single unique column was found. Select two or more columns to form a composite key.',
+        );
       setKeys([found]);
       setOptions((o) => ({
         ...o,
         ignoreColumns: o.ignoreColumns.filter((c) => c !== found),
       }));
       invalidate();
-    } else
-      setError(
-        'No single unique column was found. Select two or more columns to form a composite key.',
-      );
+    } catch (e) {
+      if (id === job.current && (e as Error).name !== 'AbortError')
+        setError((e as Error).message);
+    } finally {
+      if (id === job.current) setBusy(false);
+    }
   }
   return (
     <div className="app-shell">
@@ -217,7 +238,7 @@ export default function App() {
             text={left}
             name={leftName}
             format={leftFormat}
-            count={inputs.a?.rows.length}
+            count={inputs.a?.count}
             columns={inputs.a?.columns.length}
             onChange={(text, name) => {
               setLeft(text);
@@ -229,6 +250,7 @@ export default function App() {
               invalidate();
             }}
             onError={(message) => {
+              invalidate();
               setError(message);
               setReport(null);
             }}
@@ -240,7 +262,7 @@ export default function App() {
             text={right}
             name={rightName}
             format={rightFormat}
-            count={inputs.b?.rows.length}
+            count={inputs.b?.count}
             columns={inputs.b?.columns.length}
             onChange={(text, name) => {
               setRight(text);
@@ -252,6 +274,7 @@ export default function App() {
               invalidate();
             }}
             onError={(message) => {
+              invalidate();
               setError(message);
               setReport(null);
             }}
@@ -299,6 +322,7 @@ export default function App() {
           <Button
             variant="ghost"
             className="action-button suggest-button"
+            disabled={loading || busy}
             onClick={suggest}
           >
             <Lightbulb />
@@ -319,9 +343,25 @@ export default function App() {
               </span>
             </CollapsibleTrigger>
             <span className="keyboard-hint">Ctrl / ⌘ + Enter</span>
-            <Button className="action-button compare-button" onClick={compare}>
+            {busy && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  invalidate();
+                  cancel();
+                  setNotice('Stopped. Your inputs are unchanged.');
+                }}
+              >
+                Stop
+              </Button>
+            )}
+            <Button
+              className="action-button compare-button"
+              onClick={compare}
+              disabled={loading || busy}
+            >
               <ArrowRightLeft />
-              Compare data
+              {busy ? 'Working…' : loading ? 'Reading data…' : 'Compare data'}
               <ArrowRight size={16} />
             </Button>
           </div>
@@ -392,15 +432,21 @@ export default function App() {
             </div>
           </CollapsibleContent>
         </Collapsible>
-        {error && (
+        {notice && <output className="export-notice">{notice}</output>}
+        {loading && (
+          <output className="worker-status">
+            Reading locally in the background. You can keep editing.
+          </output>
+        )}
+        {visibleError && (
           <div className="error-box" role="alert">
-            {error}
+            {visibleError}
           </div>
         )}
         {report ? (
           <Results key={revision} report={report} />
         ) : (
-          !error && (
+          !visibleError && (
             <div className="empty-result">
               <ArrowRightLeft size={28} />
               <h2>Ready when you are</h2>

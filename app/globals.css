@@ -42,6 +42,12 @@
   --amber-bg: #fff7e4;
   --radius: 0.65rem;
 }
+.worker-status {
+  display: block;
+  margin: 1rem 0;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+}
 * {
   box-sizing: border-box;
   border-color: var(--border);

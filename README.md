@@ -115,7 +115,7 @@ npm run lint
 npm run build
 ```
 
-There are 38 automated tests covering parsing, comparison, safety limits, exports and CLI behavior. CI runs core tests on Windows and Linux with Node.js 22 and 24, plus a web lint/build job. See [test notes](docs/testing.md), [contributing](CONTRIBUTING.md) and the [security policy](SECURITY.md).
+There are 42 automated tests covering parsing, comparison, worker sessions, safety limits, exports and CLI behavior. Parsing, key suggestions and comparisons run in a Web Worker; stopping a comparison keeps your inputs. CI runs core tests on Windows and Linux with Node.js 22 and 24, plus a web lint/build job. See [test notes](docs/testing.md), [contributing](CONTRIBUTING.md) and the [security policy](SECURITY.md).
 
 If Rowglass helps with a real workflow, a star or an issue describing that workflow helps others discover it.
 

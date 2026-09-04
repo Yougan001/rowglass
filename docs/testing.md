@@ -4,7 +4,7 @@ These notes distinguish automated checks from manual browser checks. They are no
 
 ## Automated checks
 
-`npm test` runs 38 Node.js tests across the comparison, decimal and CLI suites. Coverage includes quoted delimiters/newlines, BOM, malformed CSV, JSON validation, duplicate/composite keys, column changes, type and normalization rules, nested values, numeric tolerance, report escaping, formula prefixes, record limits and CLI exit/output behavior.
+`npm test` runs 42 Node.js tests across the comparison, decimal, session and CLI suites. Coverage includes quoted delimiters/newlines, BOM, malformed CSV, JSON validation, duplicate/composite keys, column changes, type and normalization rules, nested values, numeric tolerance, report escaping, formula prefixes, record limits and CLI exit/output behavior. Session tests check that failed loads cannot reuse old data and independent sessions do not share inputs.
 
 The decimal suite includes adjacent integers beyond JavaScript's safe range, exact fractional boundaries, scientific notation, long-input limits, strict types and an integer-cent oracle. After the decimal fix, all 38 tests, lint and the production build passed.
 
@@ -12,7 +12,7 @@ A deterministic 50,000-record fixture checks correctness at the supported row li
 
 Local validation passed on Windows with Node.js 22.23.2:
 
-- `npm test`: 31 passed, 0 failed.
+- `npm test`: 42 passed, 0 failed.
 - `npm run lint`: passed.
 - `npm run build`: TypeScript and Vite production build passed.
 
@@ -35,6 +35,8 @@ Performed in a Chromium-based browser on Windows using both the development inte
 | Light and dark themes | Visually reviewed; screenshots in images/ |
 | Disable network after loading | Comparison still completes with the expected sample result |
 | Production preview | Built JavaScript loads and sample comparison gives the expected result |
+| Worker comparison, 20,000 rows × 100 columns | One modified cell; 19,999 unchanged records |
+| Stop worker comparison | Results cleared; both 4 MB inputs retained |
 
 The screenshot data is fictional. Download checks used the ignore-stock option, so that report's modified/unchanged counts differ from the default screenshot.
 

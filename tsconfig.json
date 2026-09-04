@@ -31,6 +31,7 @@
     "app/**/*.tsx",
     "components/**/*.tsx",
     "hooks/**/*.ts",
+    "workers/**/*.ts",
     "lib/**/*.ts",
     "main.tsx",
     "vite.config.ts"
