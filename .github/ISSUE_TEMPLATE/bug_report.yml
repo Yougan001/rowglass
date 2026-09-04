@@ -1,0 +1,27 @@
+name: Bug report
+description: Report a reproducible problem using synthetic data
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: "Do not include personal, customer or production data. Report security issues according to SECURITY.md."
+  - type: textarea
+    id: input
+    attributes:
+      label: Minimal inputs and comparison options
+      description: Paste small synthetic original/updated inputs and list keys, format and options.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual result
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: "Version, operating system, browser or Node.js version"
+    validations:
+      required: true
