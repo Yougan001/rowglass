@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Compare numeric tolerances with exact decimal arithmetic, including large CSV integers and long fractional strings.
+- Keep excessive numeric literals as text instead of allocating unbounded integers.
+- Add seven regression tests for decimal boundaries, scientific notation, strict types and exact keys.
+
 ## 0.1.0 — 2026-09-05
 
 First release.

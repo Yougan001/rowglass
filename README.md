@@ -90,7 +90,7 @@ The CLI is not currently published to npm.
 - Column names are case-sensitive. CSV headers must be non-empty and unique, and every row must have the expected number of fields.
 - Quoted separators, escaped quotes, embedded newlines, CRLF and UTF-8 BOM are supported. The browser importer rejects non-UTF-8 files.
 - By default, JSON number `1` and CSV string `"1"` compare equally. Leading-zero strings such as `"001"` remain distinct from `"1"`. Strict types can distinguish numbers and strings.
-- Trimming and case folding affect compared values, **not keys**. Numeric tolerance is absolute, not a percentage.
+- Trimming and case folding affect compared values, **not keys**. Numeric tolerance is absolute, not a percentage. Decimal arithmetic preserves large integers and fractional boundaries. Numeric literals longer than 1,024 characters or with exponents outside ±1,024 remain text.
 - Missing properties, JSON `null` and empty strings remain distinct.
 - Nested objects/arrays are compared as whole cells. Object property order is ignored; array order is significant. Nesting beyond 30 levels is rejected.
 - Store large identifiers as strings. Unsafe JSON integers and non-finite JSON numbers are rejected to avoid silently rounded comparisons.
@@ -115,7 +115,7 @@ npm run lint
 npm run build
 ```
 
-There are 31 automated tests covering parsing, comparison, safety limits, exports and CLI behavior. CI runs core tests on Windows and Linux with Node.js 22 and 24, plus a web lint/build job. See [test notes](docs/testing.md), [contributing](CONTRIBUTING.md) and the [security policy](SECURITY.md).
+There are 38 automated tests covering parsing, comparison, safety limits, exports and CLI behavior. CI runs core tests on Windows and Linux with Node.js 22 and 24, plus a web lint/build job. See [test notes](docs/testing.md), [contributing](CONTRIBUTING.md) and the [security policy](SECURITY.md).
 
 If Rowglass helps with a real workflow, a star or an issue describing that workflow helps others discover it.
 

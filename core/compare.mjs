@@ -1,3 +1,5 @@
+import { parseDecimal, withinTolerance } from './decimal.mjs';
+
 /** Pure, dependency-free comparison engine shared by the browser and CLI. */
 export const LIMITS = Object.freeze({
   characters: 5_000_000,
@@ -217,14 +219,8 @@ function equivalent(a, b, options) {
     y = y.toLowerCase();
   }
   if (x === y) return true;
-  const numeric = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:e[+-]?\d+)?$/i;
   return (
-    options.tolerance > 0 &&
-    numeric.test(x) &&
-    numeric.test(y) &&
-    Number.isFinite(Number(x)) &&
-    Number.isFinite(Number(y)) &&
-    Math.abs(Number(x) - Number(y)) <= options.tolerance
+    options.tolerance > 0 && withinTolerance(x, y, options.decimalTolerance)
   );
 }
 
@@ -257,6 +253,11 @@ export function compareDatasets(before, after, options = {}) {
     unchanged: 0,
     changedCells: 0,
   };
+  const comparisonOptions = {
+    ...options,
+    tolerance,
+    decimalTolerance: tolerance > 0 ? parseDecimal(String(tolerance)) : null,
+  };
   for (const key of new Set([...left.keys(), ...right.keys()])) {
     const a = left.get(key),
       b = right.get(key);
@@ -265,7 +266,7 @@ export function compareDatasets(before, after, options = {}) {
         !equivalent(
           a && Object.hasOwn(a.data, c) ? a.data[c] : undefined,
           b && Object.hasOwn(b.data, c) ? b.data[c] : undefined,
-          { ...options, tolerance },
+          comparisonOptions,
         ),
     );
     const status = !a
