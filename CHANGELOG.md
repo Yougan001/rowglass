@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 — 2026-09-05
 
 - Update the development server and React patch versions after dependency review.
 - Run parsing, key suggestions and comparisons in a worker with cancellation and stale-result protection.
@@ -8,6 +8,7 @@
 - Compare numeric tolerances with exact decimal arithmetic, including large CSV integers and long fractional strings.
 - Keep excessive numeric literals as text instead of allocating unbounded integers.
 - Add seven regression tests for decimal boundaries, scientific notation, strict types and exact keys.
+- Package the complete dependency-free CLI with a decimal regression smoke check, and the static web build with relative asset paths.
 
 ## 0.1.0 — 2026-09-05
 

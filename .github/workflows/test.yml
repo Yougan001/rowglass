@@ -26,3 +26,23 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run build
+  packages:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          ROWGLASS_BASE_PATH: ./
+      - run: ./scripts/package-release.ps1
+        shell: pwsh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-packages
+          path: |
+            work/release-*/*.zip
+            work/release-*/SHA256SUMS.txt

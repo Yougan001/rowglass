@@ -1,6 +1,6 @@
 {
   "name": "rowglass",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Local-first CSV and JSON diff viewer with key-based matching and cell-level reports.",
   "license": "MIT",

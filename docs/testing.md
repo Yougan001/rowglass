@@ -1,4 +1,4 @@
-# Test notes for 0.1.0
+# Test notes for 0.2.0
 
 These notes distinguish automated checks from manual browser checks. They are not a claim of exhaustive compatibility or a security audit.
 
@@ -39,5 +39,11 @@ Performed in a Chromium-based browser on Windows using both the development inte
 | Stop worker comparison | Results cleared; both 4 MB inputs retained |
 
 The screenshot data is fictional. Download checks used the ignore-stock option, so that report's modified/unchanged counts differ from the default screenshot.
+
+## Release archives
+
+Version 0.2.0 was built with `ROWGLASS_BASE_PATH=./` and packaged with `scripts/package-release.ps1` in PowerShell 7. The script extracts both archives into a fresh folder, runs the bundled CLI against the example files and adjacent large CSV integers, and verifies SHA-256 checksums. `-VerifyOnly` reruns those checks without replacing an archive.
+
+The extracted static web app was served over local HTTP and checked in the browser. The default example rendered correctly. A second fixture with reordered rows and Chinese product names returned one added, one removed, one modified and one unchanged record; the displayed price change was 29 → 32. These checks use the actual ZIP contents, not the source development server.
 
 Not yet verified: Safari/Firefox-specific behavior, screen-reader end-to-end use, exhaustive keyboard accessibility, very low-memory devices or all spreadsheet applications' CSV import rules. No PWA/offline refresh support is claimed.
